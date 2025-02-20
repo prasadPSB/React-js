@@ -1,51 +1,65 @@
 import React, { useState } from 'react';
 
-function App() {
-    const [input, setInput] = useState('');
-    const [result, setResult] = useState([]);
-    const [even, setEven] = useState([]);
-    const [odd, setOdd] = useState([])
-
-    function EvenOdd(event) {
-        const value = event.target.value;
-        setInput(value);
-    }
-
-    function calculate() {
-        if (input % 2 === 0) {
-            setResult([...result, input]);
-        } else {
-            setResult(...odd, input);
-        }
-    }
-        function OddEven() {
-            if (input % 2 === 0) {
-                setEven([...even, input]);
-            } else {
-                setOdd([...odd, input]);
+function App(){
+    
+    const products = [
+      { id: 1, name: "Laptop", price: 50000 },
+      { id: 2, name: "Headphones", price: 500 },
+      { id: 3, name: "Smartphone", price: 30000 },
+    ];
+    const [cart, setCart] = useState([]);
+    const [totalAmt, setTotalAmt] = useState(0);
+    const addToCart = (product) => {
+        let updatedCart = [...cart];
+        let productExists = false;
+        updatedCart = updatedCart.map((ele) => {
+            if (ele.id === product.id) {
+                productExists = true;
+                return { ...ele, price: ele.price + product.price };
             }
-        
+            return ele;
+        });
+        if (!productExists) {
+            updatedCart = [...updatedCart, product];
+            console.log(updatedCart)
+        }
+        setCart(updatedCart);
+        let total = 0
+        updatedCart.map((element)=>{
+            total += element.price;
+        })
+        setTotalAmt(total)
     }
-    return (
+   
+    const removeFromCart = (index) => {
+        setCart((prevCart) => {
+            const updatedCart = prevCart.filter((_, i) => i !== index);
+            let total = 0;
+            updatedCart.map((element) => {
+                total += element.price;
+            });
+            setTotalAmt(total);
+            return updatedCart;
+        });
+    };
+  
+    return(
         <div>
-            <label>Enter Number :</label>
-            <input type="number" value={input} onChange={EvenOdd} />
-                <button onClick={calculate}>Submit</button><br />
-            <div>{result}</div>
-            <div>
-                <button onClick={OddEven}>Calculate</button><br />
-                <label>Even Numbers:</label>
-                {even.map((num, index) => (
-                    <div key={index}>{num}</div>
-                ))}
-
-            </div>
-            <div>
-                <label>Odd Numbers:</label>
-                {odd.map((num, index) => (
-                    <div key={index}>{num}</div>
-                ))}
-            </div>
+            <h2>Shopping Cart</h2>
+            {products.map((product) => (
+                <div key={product.id}>
+                    {product.name} - ₹{product.price}
+                    <button onClick={() => addToCart(product)}>Add to Cart</button>
+                </div>
+            ))}
+            <h3>Cart</h3>
+            {cart.map((product, index) => (
+                <div key={index}>
+                    {product.name} - ₹{product.price}
+                    <button onClick={() => removeFromCart(index)}>Remove from Cart</button>
+                </div>
+            ))}
+            <div>Total Amount: ₹{totalAmt}</div>
         </div>
     )
 }
